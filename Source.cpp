@@ -1,33 +1,38 @@
-#include <Windows.h>
+// dodatkowa konfiguracja dla kompilatora MSVC
+#pragma warning(disable:4244)
+#pragma warning(disable:4996 4005)
+#define _CRT_SECURE_NO_WARNINGS
+#define _USE_MATH_DEFINES
+#ifdef UNICODE
+# undef UNICODE
+# define _MBCS
+#endif
+
+#include <iostream>
+
+// pliki biblioteki standardowej jezyka C:
+#include <stdlib.h>
+
+// plik naglowkowy z deklaracjami elementow interfejsu Win32 API:
+#include <windows.h>
 #include <tchar.h>
 #include <strsafe.h>
 #include "resource.h"
 
-INT_PTR CALLBACK ListBoxExampleProc(HWND hDlg, UINT message,
-	WPARAM wParam, LPARAM lParam);
+// deklaracja funkcji okna:
+LRESULT CALLBACK FunOkna(HWND, UINT, WPARAM, LPARAM);
 
-INT_PTR CALLBACK ComboBoxAction(HWND hDlg, UINT message,
-	WPARAM wParam, LPARAM lParam);
-
-int CALLBACK _tWinMain(
-	_In_  HINSTANCE hInstance,
-	_In_  HINSTANCE hPrevInstance,
-	_In_  LPTSTR lpCmdLine,
-	_In_  int nCmdShow)
-{
-	::DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, ListBoxExampleProc);
-	::DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, ComboBoxAction);
-	
-	return 0;
-}
-
+// nazwa klasy rejestrowanej w systemie dla okna aplikacji
+char nazwaKlasy[] = "OknoAplikacji";
+//strukura wyswietlanie i liczba potegowa
 typedef struct
 {
-	TCHAR powText[12];
+	TCHAR powText[MAX_PATH];
 	int power;
 } Power;
 
-Power PowerList[]=
+// tu lista
+Power PowerList[] =
 {
 	{TEXT("x^2"), 2},
 	{TEXT("x^3"), 3},
@@ -40,117 +45,132 @@ Power PowerList[]=
 	{TEXT("x^10"), 10},
 };
 
-typedef struct
+
+// glowna funkcja programu, parametry: uchwyty do aplikacji biezacej i poprzedniej (nie uzywane obecnie),
+//                                     lancuch ze linia plecen, tryb wyswietlania okna
+int WINAPI WinMain(HINSTANCE biezAplik, HINSTANCE poprzAplik, LPSTR linPolec, int trybOkna)
 {
-	TCHAR achName[MAX_PATH];
-	TCHAR achPosition[12];
-	int nGamesPlayed;
-	int nGoalsScored;
-} Player;
+	WNDCLASS klasaOkna; // rekord do opisu nowej klasy okna
+	HWND okno; // uchwyt obiektu okna z p/w klasy
 
-Player Roster[] =
-{
-	{TEXT("Haas, Jonathan"), TEXT("Midfield"), 18, 4 },
-	{TEXT("Pai, Jyothi"), TEXT("Forward"), 36, 12 },
-	{TEXT("Hanif, Kerim"), TEXT("Back"), 26, 0 },
-	{TEXT("Anderberg, Michael"), TEXT("Back"), 24, 2 },
-	{TEXT("Jelitto, Jacek"), TEXT("Midfield"), 26, 3 },
-	{TEXT("Raposo, Rui"), TEXT("Back"), 24, 3},
-	{TEXT("Joseph, Brad"), TEXT("Forward"), 13, 3 },
-	{TEXT("Bouchard, Thomas"), TEXT("Forward"), 28, 5 },
-	{TEXT("Salmre, Ivo "), TEXT("Midfield"), 27, 7 },
-	{TEXT("Camp, David"), TEXT("Midfield"), 22, 3 },
-	{TEXT("Kohl, Franz"), TEXT("Goalkeeper"), 17, 0 },
-};
+	// wypelnienie rekordu parametrami nowej klasy okna:
+	klasaOkna.style = CS_HREDRAW | CS_VREDRAW; // wspolny styl okien klasy - odrysowywanie okna w pionie i poziomie
+	// klasaOkna.style = 0; // wspolny styl okien klasy - brak
+	klasaOkna.hInstance = biezAplik;  // uchwyt (biezacej) aplikacji dla ktorej powstanie nowa klasa
+	klasaOkna.lpszClassName = nazwaKlasy; // nazwa klasy okna
+	klasaOkna.lpfnWndProc = FunOkna;  // adres procedury okna
+	klasaOkna.hIcon = LoadIcon(NULL, IDI_APPLICATION); // ikona okna na ekranie - standardowa dla wszystkich aplikacji
+	klasaOkna.hCursor = LoadCursor(NULL, IDC_ARROW); // obraz kursora myszki nad oknem - standardowy w postaci strzalki
+	klasaOkna.lpszMenuName = NULL; // nazwa menu - brak
+	klasaOkna.cbClsExtra = 0; // dodatkowa pamiec uzytkowa dla klasy - brak
+	klasaOkna.cbWndExtra = 0; // i nowo tworzonego obiektu okna - brak
+	klasaOkna.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH); // pedzel dla tla okna - standardowy bialy kolor
+   /*
+	Zadanie: odkomentuj brak stylu okna, zakomentuj styl odrysowania w pionie i poziomie,
+			 przetestuj aplikacje zmieniajac jej rozmiar
+   */
 
+   // rejestrowanie klasy okna w systemie:
+	if (!RegisterClass(&klasaOkna)) return 0;
 
-INT_PTR CALLBACK ComboBoxAction(HWND hDlg, UINT message,
-	WPARAM wParam, LPARAM lParam) 
-{
+	okno = CreateDialog(biezAplik, MAKEINTRESOURCE(IDD_DIALOG1), NULL, FunOkna);
 
-	switch (message)
-	{
-	case WM_INITDIALOG:
-	{
-		HWND hWndComboBox = GetDlgItem(hDlg, IDC_COMBO1);
+	// wyswietlanie okna i aktualizacja zawartosci jego obszaru roboczego:
+	ShowWindow(okno, trybOkna);
+	UpdateWindow(okno);
 
-		for (int i = 0; i < ARRAYSIZE(PowerList); i++)
+	{ // Glowny kod wykonawczy programu
+		MSG komunikat; // rekord z opisem komunikatu
+
+		// petla programu do przetwarzania komunikatow aplikacji w systemie:
+		while (GetMessage(&komunikat, NULL, 0, 0)) // pobierz biezacy komunikat z kolejki biezacego procesu
 		{
-			/*SendMessage(hWndComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)A);*/
-			int pos = (int)SendMessage(hWndComboBox, LB_ADDSTRING, 0,
-				(LPARAM)PowerList[i].powText);
-			SendMessage(hWndComboBox, LB_SETITEMDATA, pos, (LPARAM)i);
+			TranslateMessage(&komunikat); // przeksztalca biezacy komunikat (jedynie zamienia kod zdarzenia dot. klawiszy)
+			DispatchMessage(&komunikat); // wysyla biezacy komunikat do docelowego okna
 		}
 
-		/*SendMessage(hWndComboBox, CB_SETCURSEL, (WPARAM)2, (LPARAM)0);*/
-		SetFocus(hWndComboBox);
-		return TRUE;
+		// zakonczenie programu i zwrocenie wartosci parametru z ostatniego komunikatu:
+		return (int)komunikat.wParam;
 	}
-	}
-
-	return FALSE;
 }
 
 
-INT_PTR CALLBACK ListBoxExampleProc(HWND hDlg, UINT message,
-	WPARAM wParam, LPARAM lParam)
+
+int DisplayResourceNAMessageBox()
 {
-	switch (message)
+	int msgboxID = MessageBox(
+		NULL,
+		(LPCSTR)L"Resource not available\nDo you want to try again?",
+		(LPCSTR)L"Account Details",
+		MB_ICONWARNING | MB_CANCELTRYCONTINUE | MB_DEFBUTTON2
+	);
+
+	switch (msgboxID)
+	{
+	case IDCANCEL:
+		// TODO: add code
+		break;
+	case IDTRYAGAIN:
+		// TODO: add code
+		break;
+	case IDCONTINUE:
+		// TODO: add code
+		break;
+	}
+
+	return msgboxID;
+}
+
+HWND bEdit;
+HWND lBox;
+
+// funkcja okna do obslugi jego komunikatow,
+//             parametry: uchwyt okna, identyfikator liczbowy biezacego komunikatu, 
+//                        dwa uzytkowe parametry komunikatu
+LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam)
+{
+	switch (komunikat)
 	{
 	case WM_INITDIALOG:
 	{
-		// Add items to list. 
-		HWND hwndList = GetDlgItem(hDlg, IDC_LIST1);
-		for (int i = 0; i < ARRAYSIZE(Roster); i++)
+		HWND hWndComboBox = GetDlgItem(okno, IDC_COMBO1);
+		for (int i = 0; i < ARRAYSIZE(PowerList); i++)
 		{
-			int pos = (int)SendMessage(hwndList, LB_ADDSTRING, 0,
-				(LPARAM)Roster[i].achName);
-			// Set the array index of the player as item data.
-			// This enables us to retrieve the item from the array
-			// even after the items are sorted by the list box.
-			SendMessage(hwndList, LB_SETITEMDATA, pos, (LPARAM)i);
-		}
-		// Set input focus to the list box.
-		SetFocus(hwndList);
-		return TRUE;
-	}
 
+			SendMessage(hWndComboBox, CB_ADDSTRING, 0, (LPARAM)PowerList[i].powText);
+		}
+		return 0;
+	}
 	case WM_COMMAND:
-		switch (LOWORD(wParam))
-		{
-		case IDOK:
-		case IDCANCEL:
-			EndDialog(hDlg, LOWORD(wParam));
-			return TRUE;
-
-		case IDC_LIST1:
-		{
-			switch (HIWORD(wParam))
-			{
-			case LBN_SELCHANGE:
-			{
-				HWND hwndList = GetDlgItem(hDlg, IDC_LIST1);
-
-				// Get selected index.
-				int lbItem = (int)SendMessage(hwndList, LB_GETCURSEL, 0, 0);
-
-				// Get item data.
-				int i = (int)SendMessage(hwndList, LB_GETITEMDATA, lbItem, 0);
-
-				// Do something with the data from Roster[i]
-				TCHAR buff[MAX_PATH];
-				StringCbPrintf(buff, ARRAYSIZE(buff),
-					TEXT("Position: %s\nGames played: %d\nGoals: %d"),
-					Roster[i].achPosition, Roster[i].nGamesPlayed,
-					Roster[i].nGoalsScored);
-
-				SetDlgItemText(hDlg, IDC_EDIT3, buff);
-				return TRUE;
-			}
-			}
+	{
+		if (LOWORD(wParam) == IDC_BUTTON1) { // close button click
+			lBox = GetDlgItem(okno, IDC_LIST1);
+			LRESULT lResult = SendMessage(lBox, LB_ADDSTRING, NULL, LPARAM("some constant text"));
 		}
-		return TRUE;
-		}
+		return 0;
+		//if (LOWORD(wParam) == IDC_BUTTON1) // close button click
+		//	EndDialog(okno, 0);
+		//return TRUE;
 	}
-	return FALSE;
+	case WM_CLOSE: // obsluz komunikat zamkniecia okna
+	{
+		DestroyWindow(okno); // zniszcz okno glowne wysylajac komunikat WM_DESTROY i nastepnie zakoncz program
+		//PostQuitMessage(0); // natychmiast zakoncz program wysylajac komunikat WM_QUIT ale bez zniszczenia okna
+		return 0; // powrot z funkcji do petli glownej 
+	}
+	case WM_DESTROY: // obsluz komunikat zniszczenia okna
+	{
+		PostQuitMessage(0); // wyslij komunikat WM_QUIT do kolejki programu  
+	 /*
+	  Zadanie: zakomentuj p/w operacje i sprawdz stan wykonywania programu
+			   po zamknieciu okna poleceniem Alt-F4
+	 */
+		return 0; // powrot z funkcji do petli glownej i jej przerwanie
+	}
+	default: // jezeli brak jest obslugi dla biezacego komunikatu w niniejszej funkcji, to ...
+	{
+		// ... nalezy wywolac funkcje systemowa ze domyslna obsluge tego komunikatu:
+		return DefWindowProc(okno, komunikat, wParam, lParam);
+	}
+	}
 }
