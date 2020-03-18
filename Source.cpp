@@ -6,6 +6,9 @@
 INT_PTR CALLBACK ListBoxExampleProc(HWND hDlg, UINT message,
 	WPARAM wParam, LPARAM lParam);
 
+INT_PTR CALLBACK ComboBoxAction(HWND hDlg, UINT message,
+	WPARAM wParam, LPARAM lParam);
+
 int CALLBACK _tWinMain(
 	_In_  HINSTANCE hInstance,
 	_In_  HINSTANCE hPrevInstance,
@@ -13,8 +16,29 @@ int CALLBACK _tWinMain(
 	_In_  int nCmdShow)
 {
 	::DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, ListBoxExampleProc);
+	::DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, ComboBoxAction);
+	
 	return 0;
 }
+
+typedef struct
+{
+	TCHAR powText[12];
+	int power;
+} Power;
+
+Power PowerList[]=
+{
+	{TEXT("x^2"), 2},
+	{TEXT("x^3"), 3},
+	{TEXT("x^4"), 4},
+	{TEXT("x^5"), 5},
+	{TEXT("x^6"), 6},
+	{TEXT("x^7"), 7},
+	{TEXT("x^8"), 8},
+	{TEXT("x^9"), 9},
+	{TEXT("x^10"), 10},
+};
 
 typedef struct
 {
@@ -38,6 +62,34 @@ Player Roster[] =
 	{TEXT("Camp, David"), TEXT("Midfield"), 22, 3 },
 	{TEXT("Kohl, Franz"), TEXT("Goalkeeper"), 17, 0 },
 };
+
+
+INT_PTR CALLBACK ComboBoxAction(HWND hDlg, UINT message,
+	WPARAM wParam, LPARAM lParam) 
+{
+
+	switch (message)
+	{
+	case WM_INITDIALOG:
+	{
+		HWND hWndComboBox = GetDlgItem(hDlg, IDC_COMBO1);
+
+		for (int i = 0; i < ARRAYSIZE(PowerList); i++)
+		{
+			/*SendMessage(hWndComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)A);*/
+			int pos = (int)SendMessage(hWndComboBox, LB_ADDSTRING, 0,
+				(LPARAM)PowerList[i].powText);
+			SendMessage(hWndComboBox, LB_SETITEMDATA, pos, (LPARAM)i);
+		}
+
+		/*SendMessage(hWndComboBox, CB_SETCURSEL, (WPARAM)2, (LPARAM)0);*/
+		SetFocus(hWndComboBox);
+		return TRUE;
+	}
+	}
+
+	return FALSE;
+}
 
 
 INT_PTR CALLBACK ListBoxExampleProc(HWND hDlg, UINT message,
