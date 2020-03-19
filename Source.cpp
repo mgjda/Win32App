@@ -30,15 +30,15 @@ typedef struct{
 } Power;
 // tu lista
 Power PowerList[] ={
-	{TEXT("n^2"), 2},
-	{TEXT("n^3"), 3},
-	{TEXT("n^4"), 4},
-	{TEXT("n^5"), 5},
-	{TEXT("n^6"), 6},
-	{TEXT("n^7"), 7},
-	{TEXT("n^8"), 8},
-	{TEXT("n^9"), 9},
-	{TEXT("n^10"), 10},
+	{TEXT("2^n"), 2},
+	{TEXT("3^n"), 3},
+	{TEXT("4^n"), 4},
+	{TEXT("5^n"), 5},
+	{TEXT("6^n"), 6},
+	{TEXT("7^n"), 7},
+	{TEXT("8^n"), 8},
+	{TEXT("9^n"), 9},
+	{TEXT("10^n"), 10},
 };
 //HWND bEdit; // nic
 HWND lBox; // Listbox
@@ -121,8 +121,8 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			//int result;
 			//TCHAR buf[300];
 			for (int i = n; i <= n2;i++) {
-				int a= pow(i, k);
-				TCHAR buf[300];
+				int a= pow(k,i);
+				TCHAR buf[10];
 				_stprintf(buf, TEXT("%d"), a);
 				SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf);
 			}
