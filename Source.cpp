@@ -171,8 +171,7 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 	{
 		PostQuitMessage(0); // wyslij komunikat WM_QUIT do kolejki programu  
 	 /*
-	  Zadanie: zakomentuj p/w operacje i sprawdz stan wykonywania programu
-			   po zamknieciu okna poleceniem Alt-F4
+	  Zadanie: zakomentuj p/w operacje i sprawdz stan wykonywania programu  po zamknieciu okna poleceniem Alt-F4
 	 */
 		return 0; // powrot z funkcji do petli glownej i jej przerwanie
 	}
