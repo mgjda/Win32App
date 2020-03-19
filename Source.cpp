@@ -18,7 +18,7 @@
 #include <tchar.h>
 #include <strsafe.h>
 #include "resource.h"
-
+#include <winuser.h>
 // deklaracja funkcji okna:
 LRESULT CALLBACK FunOkna(HWND, UINT, WPARAM, LPARAM);
 
@@ -73,7 +73,7 @@ int WINAPI WinMain(HINSTANCE biezAplik, HINSTANCE poprzAplik, LPSTR linPolec, in
    // rejestrowanie klasy okna w systemie:
 	if (!RegisterClass(&klasaOkna)) return 0;
 
-	okno = CreateDialog(biezAplik, MAKEINTRESOURCE(IDD_DIALOG1), NULL, FunOkna);
+	okno = CreateDialog(biezAplik, MAKEINTRESOURCE(IDD_DIALOG1), NULL, (DLGPROC)FunOkna);
 
 	// wyswietlanie okna i aktualizacja zawartosci jego obszaru roboczego:
 	ShowWindow(okno, trybOkna);
