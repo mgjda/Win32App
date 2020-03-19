@@ -7,52 +7,49 @@
 # undef UNICODE
 # define _MBCS
 #endif
-
 #include <iostream>
-
 // pliki biblioteki standardowej jezyka C:
 #include <stdlib.h>
-
 // plik naglowkowy z deklaracjami elementow interfejsu Win32 API:
 #include <windows.h>
 #include <tchar.h>
 #include <strsafe.h>
+#include <string>
+#include <math.h>
+#include <vector>
 #include "resource.h"
-#include <winuser.h>
 // deklaracja funkcji okna:
 LRESULT CALLBACK FunOkna(HWND, UINT, WPARAM, LPARAM);
-
+//TCHAR* CalcPow(); // Obliczenia pot�gowania
 // nazwa klasy rejestrowanej w systemie dla okna aplikacji
 char nazwaKlasy[] = "OknoAplikacji";
 //strukura wyswietlanie i liczba potegowa
-typedef struct
-{
+typedef struct{
 	TCHAR powText[MAX_PATH];
 	int power;
 } Power;
-
 // tu lista
-Power PowerList[] =
-{
-	{TEXT("x^2"), 2},
-	{TEXT("x^3"), 3},
-	{TEXT("x^4"), 4},
-	{TEXT("x^5"), 5},
-	{TEXT("x^6"), 6},
-	{TEXT("x^7"), 7},
-	{TEXT("x^8"), 8},
-	{TEXT("x^9"), 9},
-	{TEXT("x^10"), 10},
+Power PowerList[] ={
+	{TEXT("n^2"), 2},
+	{TEXT("n^3"), 3},
+	{TEXT("n^4"), 4},
+	{TEXT("n^5"), 5},
+	{TEXT("n^6"), 6},
+	{TEXT("n^7"), 7},
+	{TEXT("n^8"), 8},
+	{TEXT("n^9"), 9},
+	{TEXT("n^10"), 10},
 };
-
-
-// glowna funkcja programu, parametry: uchwyty do aplikacji biezacej i poprzedniej (nie uzywane obecnie),
-//                                     lancuch ze linia plecen, tryb wyswietlania okna
-int WINAPI WinMain(HINSTANCE biezAplik, HINSTANCE poprzAplik, LPSTR linPolec, int trybOkna)
-{
+//HWND bEdit; // nic
+HWND lBox; // Listbox
+HWND hWndComboBox; //Combobox
+HWND eVar1; // Input 1
+HWND eVar2; // Input 2
+HWND eVar3; // To jest ten na samym dole okna z regu�� z jakiej zosta�o wyliczone
+// glowna funkcja programu, parametry: uchwyty do aplikacji biezacej i poprzedniej (nie uzywane obecnie), lancuch ze linia plecen, tryb wyswietlania okna
+int WINAPI WinMain(HINSTANCE biezAplik, HINSTANCE poprzAplik, LPSTR linPolec, int trybOkna){
 	WNDCLASS klasaOkna; // rekord do opisu nowej klasy okna
 	HWND okno; // uchwyt obiektu okna z p/w klasy
-
 	// wypelnienie rekordu parametrami nowej klasy okna:
 	klasaOkna.style = CS_HREDRAW | CS_VREDRAW; // wspolny styl okien klasy - odrysowywanie okna w pionie i poziomie
 	// klasaOkna.style = 0; // wspolny styl okien klasy - brak
@@ -69,83 +66,95 @@ int WINAPI WinMain(HINSTANCE biezAplik, HINSTANCE poprzAplik, LPSTR linPolec, in
 	Zadanie: odkomentuj brak stylu okna, zakomentuj styl odrysowania w pionie i poziomie,
 			 przetestuj aplikacje zmieniajac jej rozmiar
    */
-
    // rejestrowanie klasy okna w systemie:
 	if (!RegisterClass(&klasaOkna)) return 0;
-
 	okno = CreateDialog(biezAplik, MAKEINTRESOURCE(IDD_DIALOG1), NULL, (DLGPROC)FunOkna);
-
 	// wyswietlanie okna i aktualizacja zawartosci jego obszaru roboczego:
 	ShowWindow(okno, trybOkna);
 	UpdateWindow(okno);
-
 	{ // Glowny kod wykonawczy programu
 		MSG komunikat; // rekord z opisem komunikatu
-
 		// petla programu do przetwarzania komunikatow aplikacji w systemie:
 		while (GetMessage(&komunikat, NULL, 0, 0)) // pobierz biezacy komunikat z kolejki biezacego procesu
 		{
 			TranslateMessage(&komunikat); // przeksztalca biezacy komunikat (jedynie zamienia kod zdarzenia dot. klawiszy)
 			DispatchMessage(&komunikat); // wysyla biezacy komunikat do docelowego okna
 		}
-
 		// zakonczenie programu i zwrocenie wartosci parametru z ostatniego komunikatu:
 		return (int)komunikat.wParam;
 	}
 }
-
-
-
-int DisplayResourceNAMessageBox()
-{
-	int msgboxID = MessageBox(
-		NULL,
-		(LPCSTR)L"Resource not available\nDo you want to try again?",
-		(LPCSTR)L"Account Details",
-		MB_ICONWARNING | MB_CANCELTRYCONTINUE | MB_DEFBUTTON2
-	);
-
-	switch (msgboxID)
-	{
-	case IDCANCEL:
-		// TODO: add code
-		break;
-	case IDTRYAGAIN:
-		// TODO: add code
-		break;
-	case IDCONTINUE:
-		// TODO: add code
-		break;
-	}
-
-	return msgboxID;
-}
-
-HWND bEdit;
-HWND lBox;
-
 // funkcja okna do obslugi jego komunikatow,
 //             parametry: uchwyt okna, identyfikator liczbowy biezacego komunikatu, 
 //                        dwa uzytkowe parametry komunikatu
 LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam)
 {
-	switch (komunikat)
-	{
-	case WM_INITDIALOG:
-	{
-		HWND hWndComboBox = GetDlgItem(okno, IDC_COMBO1);
-		for (int i = 0; i < ARRAYSIZE(PowerList); i++)
-		{
-
+	switch (komunikat)	{
+	case WM_INITDIALOG:	{
+		hWndComboBox = GetDlgItem(okno, IDC_COMBO1);
+		for (int i = 0; i < ARRAYSIZE(PowerList); i++){
 			SendMessage(hWndComboBox, CB_ADDSTRING, 0, (LPARAM)PowerList[i].powText);
 		}
+		SendMessage(hWndComboBox, CB_SETCURSEL, (WPARAM)0, 0);
+		eVar1 = GetDlgItem(okno, IDC_EDIT1); //przypisanie id kontrolki do hwnd
+		SetWindowText(eVar1, "1"); //ustawienie domy�lnego tekstu
+		eVar2 = GetDlgItem(okno, IDC_EDIT2); //przypisanie id kontrolki do hwnd
+		SetWindowText(eVar2, "10"); //ustawienie domy�lnego tekstu
 		return 0;
 	}
-	case WM_COMMAND:
-	{
+	case WM_COMMAND:	{
 		if (LOWORD(wParam) == IDC_BUTTON1) { // close button click
-			lBox = GetDlgItem(okno, IDC_LIST1);
-			LRESULT lResult = SendMessage(lBox, LB_ADDSTRING, NULL, LPARAM("some constant text"));
+			lBox = GetDlgItem(okno, IDC_LIST1); 
+			SendMessage(lBox, LB_RESETCONTENT, 0, 0); //czyszczenie listboxa za kazdym razem przy nacisnieciu
+			TCHAR buff[1024];
+			TCHAR buff2[1024];
+			GetWindowText(eVar1, buff, 1024); //Przyjmuje warto�� z inputu
+			GetWindowText(eVar2, buff2, 1024); //Przyjmuje warto�� z inputu
+			//TCHAR* str = buff; //magiczne sztuczki
+			//TCHAR* str2 = buff; //magiczne sztuczki
+			int n = _tstoi(buff); 
+			int n2 = _tstoi(buff2); 
+			//int fooSize = n2 - n; // rozmiar dla tablicy
+			//TCHAR ** foo = new TCHAR*[fooSize];
+			int sel = SendMessage(hWndComboBox, CB_GETCURSEL, (WPARAM)0, (LPARAM)0); //pobranie aktualnie wybranego indeksu z combobox
+			int k = PowerList[sel].power; //wybranie z listy odpowiedniej liczby dla indeksu
+			//int result;
+			//TCHAR buf[300];
+			for (int i = n; i <= n2;i++) {
+				int a= pow(i, k);
+				TCHAR buf[300];
+				_stprintf(buf, TEXT("%d"), a);
+				SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf);
+			}
+			//char asddddddd[5][14] = {"sads","dasdas","dasd","dasdas","dasd" };
+			//TCHAR buf232[300];	//magiczne sztuczki ciag dalszy
+			//_stprintf(buf232, TEXT("%d"), numbers[1]);
+			//MessageBox(NULL, (LPCSTR)foo[1], "Hi!", MB_OK);
+			//result = k*n;
+			//TCHAR buf[300];	//magiczne sztuczki ciag dalszy
+			//_stprintf(buf, TEXT("%d"), result);
+			//TCHAR* sasdadastr = CalcPow(); to nie dziala (probowalem zrobic to w osobnej funkcji ale po zwroceniu mialem jakis )
+			//LRESULT lResult = SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf); //Wypis wyniku do list boxa
+			// lResult = SendMessage(lBox, LB_ADDSTRING, 3, (LRESULT)buf); //Wypis wyniku do list boxa
+			//for (int i = 0; i < 5; ++i) {
+				//TCHAR aaaaa[MAX_PATH] = asddddddd[i];
+				//SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)a); //Wypis wyniku do list boxa
+			//}
+			//MessageBox(NULL, "Hello, World1!", "Hi!", MB_OK);
+			//delete[] foo;
+		}
+		else if (LOWORD(wParam) == IDC_LIST1 && HIWORD(wParam) == LBN_SELCHANGE) {
+			//eVar3 = GetDlgItem(okno, IDC_EDIT3); //przypisanie tego okienka z dolu
+			//TCHAR sel;
+			//sel = SendMessage(lBox, LB_GETCURSEL, (WPARAM)0, (LPARAM)0); //pobranie zaznaczonej wartosci z listboxa
+			////TCHAR buf2[300];	//magiczne sztuczki ciag dalszy
+			////_stprintf(buf2, TEXT("%d"), sel);
+			////DrawText(okno, "Sample String", -1, rect, DT_WORDBREAK);
+			////DWORD dw = SendDlgItemMessage(okno, IDC_LIST1, LB_GETCURSEL, 0, 0);
+			//SetWindowText(eVar3, (LPCTSTR)sel);
+		}
+		else if (LOWORD(wParam) == IDC_BUTTON2) {
+			MessageBox(NULL, "Hello, World2!", "Hi!", MB_OK);
 		}
 		return 0;
 		//if (LOWORD(wParam) == IDC_BUTTON1) // close button click
@@ -155,15 +164,14 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 	case WM_CLOSE: // obsluz komunikat zamkniecia okna
 	{
 		DestroyWindow(okno); // zniszcz okno glowne wysylajac komunikat WM_DESTROY i nastepnie zakoncz program
-		//PostQuitMessage(0); // natychmiast zakoncz program wysylajac komunikat WM_QUIT ale bez zniszczenia okna
+		PostQuitMessage(0); // natychmiast zakoncz program wysylajac komunikat WM_QUIT ale bez zniszczenia okna
 		return 0; // powrot z funkcji do petli glownej 
 	}
 	case WM_DESTROY: // obsluz komunikat zniszczenia okna
 	{
 		PostQuitMessage(0); // wyslij komunikat WM_QUIT do kolejki programu  
 	 /*
-	  Zadanie: zakomentuj p/w operacje i sprawdz stan wykonywania programu
-			   po zamknieciu okna poleceniem Alt-F4
+	  Zadanie: zakomentuj p/w operacje i sprawdz stan wykonywania programu  po zamknieciu okna poleceniem Alt-F4
 	 */
 		return 0; // powrot z funkcji do petli glownej i jej przerwanie
 	}
@@ -174,3 +182,13 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 	}
 	}
 }
+//TCHAR* CalcPow() { //nie ogarniam zwracania z tego
+//	TCHAR buff[1024];
+//	GetWindowText(eVar1, buff, 1024);
+//	TCHAR* str = buff;
+//	int n = _tstoi(str);
+//	int result = n + 2;
+//	TCHAR buf[300];
+//	_stprintf(buf, TEXT("%d"), result);
+//	return buf;
+//}
