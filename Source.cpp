@@ -17,10 +17,13 @@
 #include <windows.h>
 #include <tchar.h>
 #include <strsafe.h>
+#include <string>
 #include "resource.h"
 
 // deklaracja funkcji okna:
 LRESULT CALLBACK FunOkna(HWND, UINT, WPARAM, LPARAM);
+
+TCHAR* CalcPow(); // Obliczenia potêgowania
 
 // nazwa klasy rejestrowanej w systemie dla okna aplikacji
 char nazwaKlasy[] = "OknoAplikacji";
@@ -34,15 +37,15 @@ typedef struct
 // tu lista
 Power PowerList[] =
 {
-	{TEXT("x^2"), 2},
-	{TEXT("x^3"), 3},
-	{TEXT("x^4"), 4},
-	{TEXT("x^5"), 5},
-	{TEXT("x^6"), 6},
-	{TEXT("x^7"), 7},
-	{TEXT("x^8"), 8},
-	{TEXT("x^9"), 9},
-	{TEXT("x^10"), 10},
+	{TEXT("2^n"), 2},
+	{TEXT("3^n"), 3},
+	{TEXT("4^n"), 4},
+	{TEXT("5^n"), 5},
+	{TEXT("6^n"), 6},
+	{TEXT("7^n"), 7},
+	{TEXT("8^n"), 8},
+	{TEXT("9^n"), 9},
+	{TEXT("10^n"), 10},
 };
 
 
@@ -94,35 +97,12 @@ int WINAPI WinMain(HINSTANCE biezAplik, HINSTANCE poprzAplik, LPSTR linPolec, in
 	}
 }
 
-
-
-int DisplayResourceNAMessageBox()
-{
-	int msgboxID = MessageBox(
-		NULL,
-		(LPCSTR)L"Resource not available\nDo you want to try again?",
-		(LPCSTR)L"Account Details",
-		MB_ICONWARNING | MB_CANCELTRYCONTINUE | MB_DEFBUTTON2
-	);
-
-	switch (msgboxID)
-	{
-	case IDCANCEL:
-		// TODO: add code
-		break;
-	case IDTRYAGAIN:
-		// TODO: add code
-		break;
-	case IDCONTINUE:
-		// TODO: add code
-		break;
-	}
-
-	return msgboxID;
-}
-
-HWND bEdit;
-HWND lBox;
+HWND bEdit; // nic
+HWND lBox; // Listbox
+HWND hWndComboBox; //Combobox
+HWND eVar1; // Input 1
+HWND eVar2; // Input 2
+HWND eVar3; // To jest ten na samym dole okna z regu³¹ z jakiej zosta³o wyliczone
 
 // funkcja okna do obslugi jego komunikatow,
 //             parametry: uchwyt okna, identyfikator liczbowy biezacego komunikatu, 
@@ -133,19 +113,52 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 	{
 	case WM_INITDIALOG:
 	{
-		HWND hWndComboBox = GetDlgItem(okno, IDC_COMBO1);
+		hWndComboBox = GetDlgItem(okno, IDC_COMBO1);
 		for (int i = 0; i < ARRAYSIZE(PowerList); i++)
 		{
-
 			SendMessage(hWndComboBox, CB_ADDSTRING, 0, (LPARAM)PowerList[i].powText);
 		}
+		SendMessage(hWndComboBox, CB_SETCURSEL, (WPARAM)0, 0);
+
+		eVar1 = GetDlgItem(okno, IDC_EDIT1); //przypisanie id kontrolki do hwnd
+		SetWindowText(eVar1, "1"); //ustawienie domyœlnego tekstu
+
+		eVar2 = GetDlgItem(okno, IDC_EDIT2); //przypisanie id kontrolki do hwnd
+		SetWindowText(eVar2, "10"); //ustawienie domyœlnego tekstu
+
 		return 0;
 	}
 	case WM_COMMAND:
 	{
 		if (LOWORD(wParam) == IDC_BUTTON1) { // close button click
-			lBox = GetDlgItem(okno, IDC_LIST1);
-			LRESULT lResult = SendMessage(lBox, LB_ADDSTRING, NULL, LPARAM("some constant text"));
+			lBox = GetDlgItem(okno, IDC_LIST1); 
+			SendMessage(lBox, LB_RESETCONTENT, 0, 0); //czyszczenie listboxa za kazdym razem przy nacisnieciu
+			TCHAR buff[1024];
+			GetWindowText(eVar1, buff, 1024); //Przyjmuje wartoœæ z inputu
+			TCHAR* str = buff; //magiczne sztuczki
+			int n = _tstoi(str); 
+			
+			int sel;
+			sel = SendMessage(hWndComboBox, CB_GETCURSEL, (WPARAM)0, (LPARAM)0); //pobranie aktualnie wybranego indeksu z combobox
+			int k = PowerList[sel].power; //wybranie z listy odpowiedniej liczby dla indeksu
+			int result;
+			result = k*n;
+
+			TCHAR buf[300];	//magiczne sztuczki ciag dalszy
+			_stprintf(buf, TEXT("%d"), result);
+			//TCHAR* sasdadastr = CalcPow(); to nie dziala (probowalem zrobic to w osobnej funkcji ale po zwroceniu mialem jakis )
+			LRESULT lResult = SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf); //Wypis wyniku do list boxa
+			///LRESULT lResult = SendMessage(lBox, LB_ADDSTRING, NULL, LPARAM("some constant text"));
+		}
+		else if (LOWORD(wParam) == IDC_LIST1 && HIWORD(wParam) == LBN_SELCHANGE) {
+			eVar3 = GetDlgItem(okno, IDC_EDIT3); //przypisanie tego okienka z dolu
+			TCHAR sel;
+			sel = SendMessage(lBox, LB_GETCURSEL, (WPARAM)0, (LPARAM)0); //pobranie zaznaczonej wartosci z listboxa
+			TCHAR buf2[300];	//magiczne sztuczki ciag dalszy
+			//_stprintf(buf2, TEXT("%d"), sel);
+			//DrawText(okno, "Sample String", -1, rect, DT_WORDBREAK);
+			//DWORD dw = SendDlgItemMessage(okno, IDC_LIST1, LB_GETCURSEL, 0, 0);
+			SetWindowText(eVar3, (LPCTSTR)sel);
 		}
 		return 0;
 		//if (LOWORD(wParam) == IDC_BUTTON1) // close button click
@@ -173,4 +186,15 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 		return DefWindowProc(okno, komunikat, wParam, lParam);
 	}
 	}
+}
+
+TCHAR* CalcPow() { //nie ogarniam zwracania z tego
+	TCHAR buff[1024];
+	GetWindowText(eVar1, buff, 1024);
+	TCHAR* str = buff;
+	int n = _tstoi(str);
+	int result = n + 2;
+	TCHAR buf[300];
+	_stprintf(buf, TEXT("%d"), result);
+	return buf;
 }
