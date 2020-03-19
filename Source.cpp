@@ -18,6 +18,8 @@
 #include <tchar.h>
 #include <strsafe.h>
 #include <string>
+#include <math.h>
+#include <vector>
 #include "resource.h"
 
 // deklaracja funkcji okna:
@@ -48,6 +50,8 @@ Power PowerList[] =
 	{TEXT("10^n"), 10},
 };
 
+TCHAR * foo;
+int fooSize;
 
 // glowna funkcja programu, parametry: uchwyty do aplikacji biezacej i poprzedniej (nie uzywane obecnie),
 //                                     lancuch ze linia plecen, tryb wyswietlania okna
@@ -134,31 +138,52 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			lBox = GetDlgItem(okno, IDC_LIST1); 
 			SendMessage(lBox, LB_RESETCONTENT, 0, 0); //czyszczenie listboxa za kazdym razem przy nacisnieciu
 			TCHAR buff[1024];
+			TCHAR buff2[1024];
 			GetWindowText(eVar1, buff, 1024); //Przyjmuje wartoœæ z inputu
+			GetWindowText(eVar2, buff2, 1024); //Przyjmuje wartoœæ z inputu
 			TCHAR* str = buff; //magiczne sztuczki
+			TCHAR* str2 = buff; //magiczne sztuczki
 			int n = _tstoi(str); 
-			
+			int n2 = _tstoi(str2); 
+			fooSize = n2 - n; // rozmiar dla tablicy
+			foo = new TCHAR[fooSize];
 			int sel;
 			sel = SendMessage(hWndComboBox, CB_GETCURSEL, (WPARAM)0, (LPARAM)0); //pobranie aktualnie wybranego indeksu z combobox
 			int k = PowerList[sel].power; //wybranie z listy odpowiedniej liczby dla indeksu
 			int result;
+			TCHAR buf[300];
+			for (int i = n; i <= n2;i++) {
+				int a;
+				a = pow(k, i);
+				foo[i] = _stprintf(buf, TEXT("%d"), a);
+			}
+			char asddddddd[5][14] = {"sads","dasdas","dasd","dasdas","dasd" };
+			//TCHAR buf232[300];	//magiczne sztuczki ciag dalszy
+			//_stprintf(buf232, TEXT("%d"), numbers[1]);
+			//MessageBox(NULL, (LPCSTR)foo[1], "Hi!", MB_OK);
 			result = k*n;
-
-			TCHAR buf[300];	//magiczne sztuczki ciag dalszy
-			_stprintf(buf, TEXT("%d"), result);
+			//TCHAR buf[300];	//magiczne sztuczki ciag dalszy
+			//_stprintf(buf, TEXT("%d"), result);
 			//TCHAR* sasdadastr = CalcPow(); to nie dziala (probowalem zrobic to w osobnej funkcji ale po zwroceniu mialem jakis )
-			LRESULT lResult = SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf); //Wypis wyniku do list boxa
-			///LRESULT lResult = SendMessage(lBox, LB_ADDSTRING, NULL, LPARAM("some constant text"));
+			//LRESULT lResult = SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf); //Wypis wyniku do list boxa
+			// lResult = SendMessage(lBox, LB_ADDSTRING, 3, (LRESULT)buf); //Wypis wyniku do list boxa
+			for (int i = 0; i < 5; ++i) {
+				//TCHAR aaaaa[MAX_PATH] = asddddddd[i];
+				//SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)a); //Wypis wyniku do list boxa
+			}
 		}
 		else if (LOWORD(wParam) == IDC_LIST1 && HIWORD(wParam) == LBN_SELCHANGE) {
-			eVar3 = GetDlgItem(okno, IDC_EDIT3); //przypisanie tego okienka z dolu
-			TCHAR sel;
-			sel = SendMessage(lBox, LB_GETCURSEL, (WPARAM)0, (LPARAM)0); //pobranie zaznaczonej wartosci z listboxa
-			TCHAR buf2[300];	//magiczne sztuczki ciag dalszy
-			//_stprintf(buf2, TEXT("%d"), sel);
-			//DrawText(okno, "Sample String", -1, rect, DT_WORDBREAK);
-			//DWORD dw = SendDlgItemMessage(okno, IDC_LIST1, LB_GETCURSEL, 0, 0);
-			SetWindowText(eVar3, (LPCTSTR)sel);
+			//eVar3 = GetDlgItem(okno, IDC_EDIT3); //przypisanie tego okienka z dolu
+			//TCHAR sel;
+			//sel = SendMessage(lBox, LB_GETCURSEL, (WPARAM)0, (LPARAM)0); //pobranie zaznaczonej wartosci z listboxa
+			////TCHAR buf2[300];	//magiczne sztuczki ciag dalszy
+			////_stprintf(buf2, TEXT("%d"), sel);
+			////DrawText(okno, "Sample String", -1, rect, DT_WORDBREAK);
+			////DWORD dw = SendDlgItemMessage(okno, IDC_LIST1, LB_GETCURSEL, 0, 0);
+			//SetWindowText(eVar3, (LPCTSTR)sel);
+		}
+		else if (LOWORD(wParam) == IDC_BUTTON2) {
+			MessageBox(NULL, "Hello, World!", "Hi!", MB_OK);
 		}
 		return 0;
 		//if (LOWORD(wParam) == IDC_BUTTON1) // close button click
