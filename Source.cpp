@@ -78,7 +78,7 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat,WPARAM wParam, LPARAM lParam)
 		case WM_CREATE: {
 			HINSTANCE uchwytAplik = (HINSTANCE)GetWindowLong(okno, GWL_HINSTANCE); // posrednie pobranie uchwytu biezacej aplikacji
 			// Mo¿liwe do wybrania wielkoœci czcionki
-			const char *potegi[8] =
+			const char *powers[8] =
 			{ "2^n","3^n","4^n","5^n","6^n","7^n","8^n","9^n"};
 			HDC kont = GetDC(okno);
 			int i;
@@ -107,7 +107,7 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat,WPARAM wParam, LPARAM lParam)
 			n2= CreateWindowEx(0, "EDIT", "0",WS_CHILD | WS_VISIBLE | WS_BORDER | ES_NUMBER,80, 80, 80,20, okno, NULL, uchwytAplik, NULL);
 			pow_btn= CreateWindowEx(0, "BUTTON", "POTEGI",WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX | BS_PUSHLIKE,80, 200,80, 20, okno, NULL, uchwytAplik, NULL);
 			pow_combo= CreateWindowEx(0, "COMBOBOX", NULL,WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL, 80, 240, 80, 20, okno, NULL, uchwytAplik, NULL);
-			fac_btn = CreateWindowEx(0, "BUTTON", "SILNIA", WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX | BS_PUSHLIKE, 80, 280, 80, 20, okno, NULL, uchwytAplik, NULL);
+			fac_btn = CreateWindowEx(0, "BUTTON", "SILNIA n2!", WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX | BS_PUSHLIKE, 80, 280, 80, 20, okno, NULL, uchwytAplik, NULL);
 			/* Wywo³aj funkcjê FunCzcionek dla wszystkich
 			fontów zainstalowanych w systemie */
 		/*	EnumFontFamilies(kont, NULL,
@@ -127,7 +127,7 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat,WPARAM wParam, LPARAM lParam)
 			/* Wybierz wstêpnie trzeci¹ wartoœæ z listy
 			czyli wielkoœæ 10 */
 			for (i = 0; i < 8; i++)
-				SendMessage(pow_combo, CB_ADDSTRING, 0, (LPARAM)potegi[i]);
+				SendMessage(pow_combo, CB_ADDSTRING, 0, (LPARAM)powers[i]);
 			SendMessage(pow_combo, CB_SETCURSEL, 2, 0);
 			ReleaseDC(okno, kont);
 			return 0;
@@ -153,9 +153,10 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat,WPARAM wParam, LPARAM lParam)
 			PAINTSTRUCT paint;
 			char buf[5];
 			HFONT hFont;
-			HDC n1text = BeginPaint(okno, &paint);
-			TextOut(n1text, 60,42, "n1:", 4);
-			TextOut(n1text, 60,82, "n2:", 4);
+			HDC text = BeginPaint(okno, &paint);
+			TextOut(text, 60,42, "n1:", 4);
+			TextOut(text, 60,20, "Zakres indexów:", 20);
+			TextOut(text, 60,82, "n2:", 4);
 			// Wype³nij wszystkie pola struktury lf zerami
 			memset(&lf, 0, sizeof(lf));
 			// Wpisz wartoœci do odpowiednich pól
