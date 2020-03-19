@@ -80,7 +80,7 @@ int WINAPI WinMain(HINSTANCE biezAplik, HINSTANCE poprzAplik, LPSTR linPolec, in
    // rejestrowanie klasy okna w systemie:
 	if (!RegisterClass(&klasaOkna)) return 0;
 
-	okno = CreateDialog(biezAplik, MAKEINTRESOURCE(IDD_DIALOG1), NULL, FunOkna);
+	okno = CreateDialog(biezAplik, MAKEINTRESOURCE(IDD_DIALOG1), NULL, (DLGPROC)FunOkna);
 
 	// wyswietlanie okna i aktualizacja zawartosci jego obszaru roboczego:
 	ShowWindow(okno, trybOkna);
@@ -183,7 +183,7 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			//SetWindowText(eVar3, (LPCTSTR)sel);
 		}
 		else if (LOWORD(wParam) == IDC_BUTTON2) {
-			MessageBox(NULL, "Hello, World!", "Hi!", MB_OK);
+			//MessageBox(NULL, "Hello, World!", "Hi!", MB_OK);
 		}
 		return 0;
 		//if (LOWORD(wParam) == IDC_BUTTON1) // close button click
@@ -193,7 +193,7 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 	case WM_CLOSE: // obsluz komunikat zamkniecia okna
 	{
 		DestroyWindow(okno); // zniszcz okno glowne wysylajac komunikat WM_DESTROY i nastepnie zakoncz program
-		//PostQuitMessage(0); // natychmiast zakoncz program wysylajac komunikat WM_QUIT ale bez zniszczenia okna
+		PostQuitMessage(0); // natychmiast zakoncz program wysylajac komunikat WM_QUIT ale bez zniszczenia okna
 		return 0; // powrot z funkcji do petli glownej 
 	}
 	case WM_DESTROY: // obsluz komunikat zniszczenia okna
