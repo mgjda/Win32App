@@ -17,6 +17,10 @@
 #include <string>
 #include <math.h>
 #include <vector>
+#include <stdio.h>
+#include <io.h>
+#include <fcntl.h>
+#include <fstream>
 #include "resource.h"
 // deklaracja funkcji okna:
 LRESULT CALLBACK FunOkna(HWND, UINT, WPARAM, LPARAM);
@@ -48,6 +52,13 @@ HWND eVar2; // Input 2
 HWND eVar3; // To jest ten na samym dole okna z regu�� z jakiej zosta�o wyliczone
 // glowna funkcja programu, parametry: uchwyty do aplikacji biezacej i poprzedniej (nie uzywane obecnie), lancuch ze linia plecen, tryb wyswietlania okna
 int WINAPI WinMain(HINSTANCE biezAplik, HINSTANCE poprzAplik, LPSTR linPolec, int trybOkna){
+	// Zdefiniowana konsola do można używać do debugowania. 
+	AllocConsole();
+	freopen("conin$", "r", stdin);
+	freopen("conout$", "w", stdout);
+	freopen("conout$", "w", stderr);
+	printf("Debugging Window:\n"); // Używasz normalnie printf()
+	
 	WNDCLASS klasaOkna; // rekord do opisu nowej klasy okna
 	HWND okno; // uchwyt obiektu okna z p/w klasy
 	// wypelnienie rekordu parametrami nowej klasy okna:
@@ -121,7 +132,7 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			//int result;
 			//TCHAR buf[300];
 			for (int i = n; i <= n2;i++) {
-				int a= pow(k,i);
+				int a = pow(k,i);
 				TCHAR buf[10];
 				_stprintf(buf, TEXT("%d"), a);
 				SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf);
