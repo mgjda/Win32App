@@ -144,14 +144,30 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			//delete[] foo;
 		}
 		else if (LOWORD(wParam) == IDC_LIST1 && HIWORD(wParam) == LBN_SELCHANGE) {
-			//eVar3 = GetDlgItem(okno, IDC_EDIT3); //przypisanie tego okienka z dolu
-			//TCHAR sel;
-			//sel = SendMessage(lBox, LB_GETCURSEL, (WPARAM)0, (LPARAM)0); //pobranie zaznaczonej wartosci z listboxa
-			////TCHAR buf2[300];	//magiczne sztuczki ciag dalszy
-			////_stprintf(buf2, TEXT("%d"), sel);
-			////DrawText(okno, "Sample String", -1, rect, DT_WORDBREAK);
-			////DWORD dw = SendDlgItemMessage(okno, IDC_LIST1, LB_GETCURSEL, 0, 0);
-			//SetWindowText(eVar3, (LPCTSTR)sel);
+			eVar3 = GetDlgItem(okno, IDC_EDIT3);
+			lBox = GetDlgItem(okno, IDC_LIST1);
+			_ASSERTE(lBox != NULL);
+			// Pobieram aktualnie wskazany indeks w listbox
+			int itemIndex = (int)SendMessage(lBox, LB_GETCURSEL, (WPARAM)0, (LPARAM)0);
+			if (itemIndex == LB_ERR)
+			{
+				// Nic nie wskazane
+				return 1;
+			}
+			// Dlugosc tekstu w listboxie
+			int textLen = (int)SendMessage(lBox, LB_GETTEXTLEN, (WPARAM)itemIndex, 0);
+			// Allkuje buffer do przechowywania tekstu (zawiera +1 na koniec łańcucha)
+			TCHAR * textBuffer = new TCHAR[textLen + 1];
+			// Biore tekst do bufforu
+			SendMessage(lBox, LB_GETTEXT, (WPARAM)itemIndex, (LPARAM)textBuffer);
+			// Pokazówka
+			SetWindowText(eVar3, (LPCTSTR)textBuffer);
+			//MessageBox(NULL, textBuffer, _T("Selected Text:"), MB_OK);
+			delete[] textBuffer;
+			// Unikanie wiszących odniesień
+			textBuffer = NULL;
+
+			return 0;
 		}
 		else if (LOWORD(wParam) == IDC_BUTTON2) {
 			MessageBox(NULL, "Hello, World2!", "Hi!", MB_OK);
