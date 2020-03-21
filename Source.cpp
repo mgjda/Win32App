@@ -21,6 +21,7 @@
 #include <io.h>
 #include <fcntl.h>
 #include <fstream>
+#include <list>
 #include "resource.h"
 // deklaracja funkcji okna:
 LRESULT CALLBACK FunOkna(HWND, UINT, WPARAM, LPARAM);
@@ -44,6 +45,44 @@ Power PowerList[] ={
 	{TEXT("9^n"), 9},
 	{TEXT("10^n"), 10},
 };
+
+class Equation {
+private:
+
+	char* equation;
+	int number;
+
+public:
+	Equation(char* e, int n){
+		int i = 0, lenth = 0;
+		while (e[i++])
+			lenth++;
+		equation = new char[lenth + 1];
+		i = 0;
+		while (e[i])
+		{
+			equation[i] = e[i];
+			i++;
+		}
+		equation[i] = e[i];
+		number = n;
+	}
+
+	int getNumber() {
+		return number;
+	}
+
+	char* printer() {
+		return equation;
+	}
+
+	void printer2() {
+		printf(equation);
+	}
+};
+
+std::vector<Equation> arr;
+
 //HWND bEdit; // nic
 HWND lBox; // Listbox
 HWND hWndComboBox; //Combobox
@@ -131,28 +170,20 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			int k = PowerList[sel].power; //wybranie z listy odpowiedniej liczby dla indeksu
 			//int result;
 			//TCHAR buf[300];
+			int sizeofarr = n2 - n;
+			arr.reserve(sizeofarr);
 			for (int i = n; i <= n2;i++) {
 				int a = pow(k,i);
 				TCHAR buf[10];
 				_stprintf(buf, TEXT("%d"), a);
 				SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf);
+				const size_t concatenated_size = MAX_PATH;
+				char concatenated[concatenated_size];
+				snprintf(concatenated, concatenated_size, "%d^%d = %d", k, i, a);
+				Equation eq(concatenated, a);
+				arr.push_back(eq);
 			}
-			//char asddddddd[5][14] = {"sads","dasdas","dasd","dasdas","dasd" };
-			//TCHAR buf232[300];	//magiczne sztuczki ciag dalszy
-			//_stprintf(buf232, TEXT("%d"), numbers[1]);
-			//MessageBox(NULL, (LPCSTR)foo[1], "Hi!", MB_OK);
-			//result = k*n;
-			//TCHAR buf[300];	//magiczne sztuczki ciag dalszy
-			//_stprintf(buf, TEXT("%d"), result);
-			//TCHAR* sasdadastr = CalcPow(); to nie dziala (probowalem zrobic to w osobnej funkcji ale po zwroceniu mialem jakis )
-			//LRESULT lResult = SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf); //Wypis wyniku do list boxa
-			// lResult = SendMessage(lBox, LB_ADDSTRING, 3, (LRESULT)buf); //Wypis wyniku do list boxa
-			//for (int i = 0; i < 5; ++i) {
-				//TCHAR aaaaa[MAX_PATH] = asddddddd[i];
-				//SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)a); //Wypis wyniku do list boxa
-			//}
-			//MessageBox(NULL, "Hello, World1!", "Hi!", MB_OK);
-			//delete[] foo;
+			return 0;
 		}
 		else if (LOWORD(wParam) == IDC_LIST1 && HIWORD(wParam) == LBN_SELCHANGE) {
 			eVar3 = GetDlgItem(okno, IDC_EDIT3);
@@ -172,7 +203,16 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			// Biore tekst do bufforu
 			SendMessage(lBox, LB_GETTEXT, (WPARAM)itemIndex, (LPARAM)textBuffer);
 			// Pokazówka
-			SetWindowText(eVar3, (LPCTSTR)textBuffer);
+			for (std::vector<Equation>::const_iterator i = arr.begin(); i != arr.end(); ++i) {
+				Equation eq = *i;
+				TCHAR buf[300];
+				_stprintf(buf, TEXT("%d"), eq.getNumber());
+				if (_tcscmp(textBuffer,buf ) == 0 ) {
+					char* cip = eq.printer();
+					SetWindowText(eVar3, (LPCTSTR)cip);
+				}
+			}
+			//SetWindowText(eVar3, (LPCTSTR)textBuffer);
 			//MessageBox(NULL, textBuffer, _T("Selected Text:"), MB_OK);
 			delete[] textBuffer;
 			// Unikanie wiszących odniesień
@@ -184,9 +224,6 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			MessageBox(NULL, "Hello, World2!", "Hi!", MB_OK);
 		}
 		return 0;
-		//if (LOWORD(wParam) == IDC_BUTTON1) // close button click
-		//	EndDialog(okno, 0);
-		//return TRUE;
 	}
 	case WM_CLOSE: // obsluz komunikat zamkniecia okna
 	{
@@ -209,13 +246,3 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 	}
 	}
 }
-//TCHAR* CalcPow() { //nie ogarniam zwracania z tego
-//	TCHAR buff[1024];
-//	GetWindowText(eVar1, buff, 1024);
-//	TCHAR* str = buff;
-//	int n = _tstoi(str);
-//	int result = n + 2;
-//	TCHAR buf[300];
-//	_stprintf(buf, TEXT("%d"), result);
-//	return buf;
-//}
