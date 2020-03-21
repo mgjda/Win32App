@@ -54,7 +54,7 @@ public:
 		}
 		equation[i] = e[i];*/
 		size_t len = strlen(e);
-		equation = new char[len];
+		equation = new char[len+1];
 		strcpy(equation, e);
 		number = n;
 	}
@@ -66,14 +66,14 @@ public:
 	Equation(const Equation & src) {
 		number = src.number;
 		size_t len = strlen(src.equation);
-		equation = new char[len];
+		equation = new char[len+1];
 		strcpy(equation, src.equation);
 	}
 	~Equation() {
-		/*if (equation != nullptr) {
+		if (equation != nullptr) {
 			delete[]equation;
 			equation = nullptr;
-		}*/
+		}
 	}
 	unsigned long long getNumber()const {
 		return number;
