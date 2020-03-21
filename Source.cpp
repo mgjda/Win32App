@@ -81,7 +81,7 @@ public:
 	}
 };
 
-std::vector<Equation> arr;
+std::vector<Equation> arr; // Vector
 
 //HWND bEdit; // nic
 HWND lBox; // Listbox
@@ -176,12 +176,12 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 				int a = pow(k,i);
 				TCHAR buf[10];
 				_stprintf(buf, TEXT("%d"), a);
-				SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf);
-				const size_t concatenated_size = MAX_PATH;
+				SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf); // Wpisywanie do listboxa
+				const size_t concatenated_size = MAX_PATH; //Inicjowanie chara i rozmiaru
 				char concatenated[concatenated_size];
-				snprintf(concatenated, concatenated_size, "%d^%d = %d", k, i, a);
-				Equation eq(concatenated, a);
-				arr.push_back(eq);
+				snprintf(concatenated, concatenated_size, "%d^%d = %d", k, i, a); // Laczenie wszystkie w pieknego chara
+				Equation eq(concatenated, a); // Tworzenie obiektu char, wartosc liczbowa
+				arr.push_back(eq); // Dodawanie do vectora
 			}
 			return 0;
 		}
@@ -204,11 +204,16 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			SendMessage(lBox, LB_GETTEXT, (WPARAM)itemIndex, (LPARAM)textBuffer);
 			// Pokazówka
 			for (std::vector<Equation>::const_iterator i = arr.begin(); i != arr.end(); ++i) {
+				//Pobieram po koleji wszystkie obiekty z listy
 				Equation eq = *i;
 				TCHAR buf[300];
+				//Tu konwersja
 				_stprintf(buf, TEXT("%d"), eq.getNumber());
+				// Porownuje do numeru ktory wybralem z listy
 				if (_tcscmp(textBuffer,buf ) == 0 ) {
+					// Pobieram chara
 					char* cip = eq.printer();
+					// Wysylam do okna na dole do wyswietlenia
 					SetWindowText(eVar3, (LPCTSTR)cip);
 				}
 			}
