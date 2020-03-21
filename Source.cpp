@@ -25,16 +25,70 @@
 #include "resource.h"
 // deklaracja funkcji okna:
 LRESULT CALLBACK FunOkna(HWND, UINT, WPARAM, LPARAM);
-//TCHAR* CalcPow(); // Obliczenia pot�gowania
-// nazwa klasy rejestrowanej w systemie dla okna aplikacji
-char nazwaKlasy[] = "OknoAplikacji";
+unsigned long long potega(unsigned long long podstawa, unsigned long long wykladnik){
+	unsigned long long wynik = 1;
+	for (unsigned long long i = 0; i < wykladnik; i++)
+		wynik *= podstawa;
+	return wynik;
+}
 //strukura wyswietlanie i liczba potegowa
 typedef struct{
 	TCHAR powText[MAX_PATH];
 	int power;
 } Power;
+class Equation {
+private:
+	char* equation = nullptr;
+	unsigned long long  number;
+public:
+	Equation(char* e, unsigned long long n) {
+		/*int i = 0, lenth = 0;
+		while (e[i++])
+			lenth++;
+		equation = new char[lenth + 1];
+		i = 0;
+		while (e[i])
+		{
+			equation[i] = e[i];
+			i++;
+		}
+		equation[i] = e[i];*/
+		size_t len = strlen(e);
+		equation = new char[len];
+		strcpy(equation, e);
+		number = n;
+	}
+	Equation(Equation&& src) {
+		number = src.number;
+		equation = src.equation;
+		src.equation = nullptr;
+	}
+	Equation(const Equation & src) {
+		number = src.number;
+		size_t len = strlen(src.equation);
+		equation = new char[len];
+		strcpy(equation, src.equation);
+	}
+	~Equation() {
+		/*if (equation != nullptr) {
+			delete[]equation;
+			equation = nullptr;
+		}*/
+	}
+	unsigned long long getNumber()const {
+		return number;
+	}
+	const char* printer()const {
+		return equation;
+	}
+	void printer2()const {
+		printf(equation);
+	}
+};
+// Vector
+std::vector<Equation> arr; 
 // tu lista
-Power PowerList[] ={
+Power PowerList[] = {
 	{TEXT("2^n"), 2},
 	{TEXT("3^n"), 3},
 	{TEXT("4^n"), 4},
@@ -45,44 +99,6 @@ Power PowerList[] ={
 	{TEXT("9^n"), 9},
 	{TEXT("10^n"), 10},
 };
-
-class Equation {
-private:
-
-	char* equation;
-	int number;
-
-public:
-	Equation(char* e, int n){
-		int i = 0, lenth = 0;
-		while (e[i++])
-			lenth++;
-		equation = new char[lenth + 1];
-		i = 0;
-		while (e[i])
-		{
-			equation[i] = e[i];
-			i++;
-		}
-		equation[i] = e[i];
-		number = n;
-	}
-
-	int getNumber() {
-		return number;
-	}
-
-	char* printer() {
-		return equation;
-	}
-
-	void printer2() {
-		printf(equation);
-	}
-};
-
-std::vector<Equation> arr; // Vector
-
 //HWND bEdit; // nic
 HWND lBox; // Listbox
 HWND hWndComboBox; //Combobox
@@ -90,14 +106,14 @@ HWND eVar1; // Input 1
 HWND eVar2; // Input 2
 HWND eVar3; // To jest ten na samym dole okna z regu�� z jakiej zosta�o wyliczone
 // glowna funkcja programu, parametry: uchwyty do aplikacji biezacej i poprzedniej (nie uzywane obecnie), lancuch ze linia plecen, tryb wyswietlania okna
-int WINAPI WinMain(HINSTANCE biezAplik, HINSTANCE poprzAplik, LPSTR linPolec, int trybOkna){
+int WINAPI WinMain(HINSTANCE biezAplik, HINSTANCE poprzAplik, LPSTR linPolec, int trybOkna){// nazwa klasy rejestrowanej w systemie dla okna aplikacji
+	char nazwaKlasy[] = "OknoAplikacji";
 	// Zdefiniowana konsola do można używać do debugowania. 
 	AllocConsole();
 	freopen("conin$", "r", stdin);
 	freopen("conout$", "w", stdout);
 	freopen("conout$", "w", stderr);
 	printf("Debugging Window:\n"); // Używasz normalnie printf()
-	
 	WNDCLASS klasaOkna; // rekord do opisu nowej klasy okna
 	HWND okno; // uchwyt obiektu okna z p/w klasy
 	// wypelnienie rekordu parametrami nowej klasy okna:
@@ -134,11 +150,8 @@ int WINAPI WinMain(HINSTANCE biezAplik, HINSTANCE poprzAplik, LPSTR linPolec, in
 		return (int)komunikat.wParam;
 	}
 }
-// funkcja okna do obslugi jego komunikatow,
-//             parametry: uchwyt okna, identyfikator liczbowy biezacego komunikatu, 
-//                        dwa uzytkowe parametry komunikatu
-LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam)
-{
+// funkcja okna do obslugi jego komunikatow, parametry: uchwyt okna, identyfikator liczbowy biezacego komunikatu,  dwa uzytkowe parametry komunikatu
+LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam){
 	switch (komunikat)	{
 	case WM_INITDIALOG:	{
 		hWndComboBox = GetDlgItem(okno, IDC_COMBO1);
@@ -154,6 +167,7 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 	}
 	case WM_COMMAND:	{
 		if (LOWORD(wParam) == IDC_BUTTON1) { // close button click
+			arr.clear();
 			lBox = GetDlgItem(okno, IDC_LIST1); 
 			SendMessage(lBox, LB_RESETCONTENT, 0, 0); //czyszczenie listboxa za kazdym razem przy nacisnieciu
 			TCHAR buff[1024];
@@ -170,18 +184,19 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			int k = PowerList[sel].power; //wybranie z listy odpowiedniej liczby dla indeksu
 			//int result;
 			//TCHAR buf[300];
-			int sizeofarr = n2 - n;
-			arr.reserve(sizeofarr);
-			for (int i = n; i <= n2;i++) {
-				int a = pow(k,i);
-				TCHAR buf[10];
-				_stprintf(buf, TEXT("%d"), a);
+			//int sizeofarr = (n2 - n)+1;
+			//arr.reserve(sizeofarr);
+			for (unsigned long long i = n; i <= n2; i++) {
+				//unsigned long long a = pow(k, i);
+				unsigned long long a = potega(k, i);
+				TCHAR buf[200];
+				_stprintf(buf, TEXT("%llu"), a);
 				SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf); // Wpisywanie do listboxa
-				const size_t concatenated_size = MAX_PATH; //Inicjowanie chara i rozmiaru
+				const size_t concatenated_size = 300;//MAX_PATH; //Inicjowanie chara i rozmiaru
 				char concatenated[concatenated_size];
-				snprintf(concatenated, concatenated_size, "%d^%d = %d", k, i, a); // Laczenie wszystkie w pieknego chara
-				Equation eq(concatenated, a); // Tworzenie obiektu char, wartosc liczbowa
-				arr.push_back(eq); // Dodawanie do vectora
+				snprintf(concatenated, concatenated_size, "%d^%d = %llu", k, i, a); // Laczenie wszystkie w pieknego chara
+				//Equation eq(concatenated, a); // Tworzenie obiektu char, wartosc liczbowa
+				arr.push_back(Equation(concatenated, a)); // Dodawanie do vectora
 			}
 			return 0;
 		}
@@ -203,16 +218,27 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			// Biore tekst do bufforu
 			SendMessage(lBox, LB_GETTEXT, (WPARAM)itemIndex, (LPARAM)textBuffer);
 			// Pokazówka
-			for (std::vector<Equation>::const_iterator i = arr.begin(); i != arr.end(); ++i) {
-				//Pobieram po koleji wszystkie obiekty z listy
-				Equation eq = *i;
+
+			//for (std::vector<Equation>::const_iterator i = arr.begin(); i != arr.end(); ++i) {
+			//	//Pobieram po koleji wszystkie obiekty z listy
+			//	Equation eq = *i;
+			//	TCHAR buf[300];
+			//	//Tu konwersja
+			//	_stprintf(buf, TEXT("%d"), eq.getNumber());
+			//	// Porownuje do numeru ktory wybralem z listy
+			//	if (_tcscmp(textBuffer,buf ) == 0 ) {
+			//		// Pobieram chara
+			//		char* cip = eq.printer();
+			//		// Wysylam do okna na dole do wyswietlenia
+			//		SetWindowText(eVar3, (LPCTSTR)cip);
+			//	}
+			//}
+			for (const auto &x : arr) {
 				TCHAR buf[300];
-				//Tu konwersja
-				_stprintf(buf, TEXT("%d"), eq.getNumber());
-				// Porownuje do numeru ktory wybralem z listy
-				if (_tcscmp(textBuffer,buf ) == 0 ) {
+				_stprintf(buf, TEXT("%llu"), x.getNumber());
+				if (_tcscmp(textBuffer, buf) == 0) {
 					// Pobieram chara
-					char* cip = eq.printer();
+					const char* cip = x.printer();
 					// Wysylam do okna na dole do wyswietlenia
 					SetWindowText(eVar3, (LPCTSTR)cip);
 				}
@@ -251,3 +277,4 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 	}
 	}
 }
+
