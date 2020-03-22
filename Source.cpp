@@ -291,13 +291,13 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 				silnia *= i;
 				TCHAR buf[300];
 				//_stprintf(buf, TEXT("%d"), silnia);
-				_stprintf(buf, TEXT("%llu"), silnia);
+				_stprintf(buf, TEXT("%.15Lg"), silnia);
 				/*TCHAR buf2[20];
 				_stprintf(buf2, TEXT("%d !=%d"), i, silnia);*/
 				SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf);
 				const size_t concatenated_size = 300;
 				char concatenated[concatenated_size];
-				snprintf(concatenated, concatenated_size, "%d! = %llu", i, silnia);
+				snprintf(concatenated, concatenated_size, "%d! = %.15Lg", i, silnia);
 				arr.push_back(Equation(concatenated, silnia));
 			}
 		}
