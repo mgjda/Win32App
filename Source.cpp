@@ -152,6 +152,8 @@ int WINAPI WinMain(HINSTANCE biezAplik, HINSTANCE poprzAplik, LPSTR linPolec, in
 }
 // funkcja okna do obslugi jego komunikatow, parametry: uchwyt okna, identyfikator liczbowy biezacego komunikatu,  dwa uzytkowe parametry komunikatu
 LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam){
+
+	HWND g_hPrzycisk;
 	switch (komunikat)	{
 	case WM_INITDIALOG:	{
 		hWndComboBox = GetDlgItem(okno, IDC_COMBO1);
@@ -264,6 +266,40 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			GetWindowText(eVar2, buff2, 1024);
 			int x = _tstoi(buff);
 			int y = _tstoi(buff2);
+			if (y < 1 || x<1) {
+
+				// int msgboxID = MessageBox(NULL, "Zly zakres liczbowy", "Blad",  MB_OK);
+				MessageBox(NULL, "Zly zakres liczbowy", "Blad", MB_SERVICE_NOTIFICATION);
+				return 0;
+				/*g_hPrzycisk = CreateWindowEx(0, "BUTTON", "Nasz przycisk", WS_CHILD | WS_VISIBLE,
+					100, 100, 150, 30, okno, NULL, NULL , NULL);
+			if ((HWND)lParam == g_hPrzycisk)
+			{
+				MessageBox(okno, "Nacisnąłeś przycisk!", "Ha!", MB_ICONINFORMATION);
+*/
+			//}
+				//switch (msgboxID) {
+				//case WM_COMMAND:
+				//	
+				//case IDCANCEL:// you check msdn for more cases
+				//{
+				//	PostQuitMessage(0);
+				//	return 0;
+				//}
+				//case MB_OK:
+				//{
+				//	PostQuitMessage(0);
+				//	return 0;
+
+				//}
+
+
+				//}
+			}
+
+
+			
+
 			int sel = SendMessage(hWndComboBox, CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
 			int k = PowerList[sel].power;
 			unsigned long long silnia = 1;
@@ -282,7 +318,23 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			}
 		}
 
+		
+			
 
+		return 0;
+	}
+	
+	//case MB_OK:// you check msdn for more cases
+	//{
+	//	PostQuitMessage(0);
+	//	return DefWindowProc(okno, komunikat, wParam, lParam);;
+	//}
+	case MB_SERVICE_NOTIFICATION:
+	{
+		PostQuitMessage(0); // wyslij komunikat WM_QUIT do kolejki programu  
+	 /*
+	  Zadanie: zakomentuj p/w operacje i sprawdz stan wykonywania programu  po zamknieciu okna poleceniem Alt-F4
+	 */
 		return 0;
 	}
 	case WM_CLOSE: // obsluz komunikat zamkniecia okna
