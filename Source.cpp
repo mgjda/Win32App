@@ -25,12 +25,12 @@
 #include "resource.h"
 // deklaracja funkcji okna:
 LRESULT CALLBACK FunOkna(HWND, UINT, WPARAM, LPARAM);
-unsigned long long potega(unsigned long long podstawa, unsigned long long wykladnik){
-	unsigned long long wynik = 1;
-	for (unsigned long long i = 0; i < wykladnik; i++)
-		wynik *= podstawa;
-	return wynik;
-}
+//unsigned long long potega(unsigned long long podstawa, unsigned long long wykladnik){
+//	unsigned long long wynik = 1;
+//	for (unsigned long long i = 0; i < wykladnik; i++)
+//		wynik *= podstawa;
+//	return wynik;
+//}
 //strukura wyswietlanie i liczba potegowa
 typedef struct{
 	TCHAR powText[MAX_PATH];
@@ -39,9 +39,9 @@ typedef struct{
 class Equation {
 private:
 	char* equation = nullptr;
-	unsigned long long  number;
+	long double  number;
 public:
-	Equation(char* e, unsigned long long n) {
+	Equation(char* e,long double n) {
 		/*int i = 0, lenth = 0;
 		while (e[i++])
 			lenth++;
@@ -75,7 +75,7 @@ public:
 			equation = nullptr;
 		}
 	}
-	unsigned long long getNumber()const {
+	long double getNumber()const {
 		return number;
 	}
 	const char* printer()const {
@@ -178,26 +178,31 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			//TCHAR* str2 = buff; //magiczne sztuczki
 			int n = _tstoi(buff); 
 			int n2 = _tstoi(buff2); 
-			//int fooSize = n2 - n; // rozmiar dla tablicy
-			//TCHAR ** foo = new TCHAR*[fooSize];
-			int sel = SendMessage(hWndComboBox, CB_GETCURSEL, (WPARAM)0, (LPARAM)0); //pobranie aktualnie wybranego indeksu z combobox
-			int k = PowerList[sel].power; //wybranie z listy odpowiedniej liczby dla indeksu
-			//int result;
-			//TCHAR buf[300];
-			//int sizeofarr = (n2 - n)+1;
-			//arr.reserve(sizeofarr);
-			for (unsigned long long i = n; i <= n2; i++) {
-				//unsigned long long a = pow(k, i);
-				unsigned long long a = potega(k, i);
-				TCHAR buf[200];
-				_stprintf(buf, TEXT("%llu"), a);
-				SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf); // Wpisywanie do listboxa
-				const size_t concatenated_size = 300;//MAX_PATH; //Inicjowanie chara i rozmiaru
-				char concatenated[concatenated_size];
-				snprintf(concatenated, concatenated_size, "%d^%d = %llu", k, i, a); // Laczenie wszystkie w pieknego chara
-				//Equation eq(concatenated, a); // Tworzenie obiektu char, wartosc liczbowa
-				arr.push_back(Equation(concatenated, a)); // Dodawanie do vectora
+			if (n2 >= n) {
+				//int fooSize = n2 - n; // rozmiar dla tablicy
+				//TCHAR ** foo = new TCHAR*[fooSize];
+				int sel = SendMessage(hWndComboBox, CB_GETCURSEL, (WPARAM)0, (LPARAM)0); //pobranie aktualnie wybranego indeksu z combobox
+				int k = PowerList[sel].power; //wybranie z listy odpowiedniej liczby dla indeksu
+				//int result;
+				//TCHAR buf[300];
+				//int sizeofarr = (n2 - n)+1;
+				//arr.reserve(sizeofarr);
+				for (int i = n; i <= n2; i++) {
+					//unsigned long long a = pow(k, i);
+					long double a = std::powl(k, i);
+					TCHAR buf[200];
+					_stprintf(buf, TEXT("%.4Lf"), a);
+					SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf); // Wpisywanie do listboxa
+					const size_t concatenated_size = 300;//MAX_PATH; //Inicjowanie chara i rozmiaru
+					char concatenated[concatenated_size];
+					snprintf(concatenated, concatenated_size, "%d^%d = %.4Lf", k, i, a); // Laczenie wszystkie w pieknego chara
+					//Equation eq(concatenated, a); // Tworzenie obiektu char, wartosc liczbowa
+					arr.push_back(Equation(concatenated, a)); // Dodawanie do vectora
+				}
 			}
+			else
+				//MessageBox(okno, "Zle wartosci indexow", "Error", MB_ICONWARNING | MB_OK);
+				SendMessage(lBox, LB_ADDSTRING, NULL, (LPARAM)"Zle wartosci indexow");
 			return 0;
 		}
 		else if (LOWORD(wParam) == IDC_LIST1 && HIWORD(wParam) == LBN_SELCHANGE) {
@@ -236,12 +241,10 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			//HDC hdc = GetDC(eVar3);
 			for (const auto &x : arr) {
 				TCHAR buf[300];
-				_stprintf(buf, TEXT("%llu"), x.getNumber());
-				if (_tcscmp(textBuffer, buf) == 0) {
+				_stprintf(buf, TEXT("%.4lf"), x.getNumber());
+				if (strcmp(textBuffer, buf) == 0) {
 					// Pobieram chara
-					const char* cip = x.printer();
-
-					
+					const char* cip = x.printer();					
 					// Wysylam do okna na dole do wyswietlenia
 					//SetTextAlign(hdc, TA_CENTER);
 					SetWindowText(eVar3, (LPCTSTR)cip);
@@ -255,6 +258,7 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			return 0;
 		}
 		else if (LOWORD(wParam) == IDC_BUTTON2) {
+			arr.clear();
 			lBox = GetDlgItem(okno, IDC_LIST1);
 			SendMessage(lBox, LB_RESETCONTENT, 0, 0);
 			TCHAR buff[1024];
@@ -265,23 +269,21 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			int y = _tstoi(buff2);
 			int sel = SendMessage(hWndComboBox, CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
 			int k = PowerList[sel].power;
-			unsigned long long silnia = 1;
+			long double silnia = 1;
 			for (int i = x; i <= y; i++) {
 				silnia *= i;
 				TCHAR buf[300];
 				//_stprintf(buf, TEXT("%d"), silnia);
-				_stprintf(buf, TEXT("%llu"), silnia);
+				_stprintf(buf, TEXT("%.0Lf"), silnia);
 				/*TCHAR buf2[20];
 				_stprintf(buf2, TEXT("%d !=%d"), i, silnia);*/
 				SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf);
 				const size_t concatenated_size = 300;
 				char concatenated[concatenated_size];
-				snprintf(concatenated, concatenated_size, "%d! = %llu", i, silnia);
+				snprintf(concatenated, concatenated_size, "%d! = %.0Lf", i, silnia);
 				arr.push_back(Equation(concatenated, silnia));
 			}
 		}
-
-
 		return 0;
 	}
 	case WM_CLOSE: // obsluz komunikat zamkniecia okna
