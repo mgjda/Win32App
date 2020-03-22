@@ -202,7 +202,7 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			}
 			else
 				//MessageBox(okno, "Zle wartosci indexow", "Error", MB_ICONWARNING | MB_OK);
-				SendMessage(lBox, LB_ADDSTRING, NULL, (LPARAM)"Zle wartosci indexow");
+				MessageBox(NULL, "Zly zakres liczbowy", "Blad", MB_SERVICE_NOTIFICATION);
 			return 0;
 		}
 		else if (LOWORD(wParam) == IDC_LIST1 && HIWORD(wParam) == LBN_SELCHANGE) {
@@ -280,7 +280,7 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 				return 0;
 
 			}
-			if (x >= y) {
+			else if (x >= y) {
 				MessageBox(NULL, "Wartosc poczatkowa nie moze byc wieksza od koncowej", "Blad", MB_SERVICE_NOTIFICATION);
 				return 0;
 			}
@@ -291,13 +291,13 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 				silnia *= i;
 				TCHAR buf[300];
 				//_stprintf(buf, TEXT("%d"), silnia);
-				_stprintf(buf, TEXT("%llu"), silnia);
+				_stprintf(buf, TEXT("%Lg"), silnia);
 				/*TCHAR buf2[20];
 				_stprintf(buf2, TEXT("%d !=%d"), i, silnia);*/
 				SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf);
 				const size_t concatenated_size = 300;
 				char concatenated[concatenated_size];
-				snprintf(concatenated, concatenated_size, "%d! = %llu", i, silnia);
+				snprintf(concatenated, concatenated_size, "%d! = %Lg", i, silnia);
 				arr.push_back(Equation(concatenated, silnia));
 			}
 		}
