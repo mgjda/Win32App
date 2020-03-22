@@ -221,21 +221,6 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			SendMessage(lBox, LB_GETTEXT, (WPARAM)itemIndex, (LPARAM)textBuffer);
 			// Pokazówka
 
-			//for (std::vector<Equation>::const_iterator i = arr.begin(); i != arr.end(); ++i) {
-			//	//Pobieram po koleji wszystkie obiekty z listy
-			//	Equation eq = *i;
-			//	TCHAR buf[300];
-			//	//Tu konwersja
-			//	_stprintf(buf, TEXT("%d"), eq.getNumber());
-			//	// Porownuje do numeru ktory wybralem z listy
-			//	if (_tcscmp(textBuffer,buf ) == 0 ) {
-			//		// Pobieram chara
-			//		char* cip = eq.printer();
-			//		// Wysylam do okna na dole do wyswietlenia
-			//		SetWindowText(eVar3, (LPCTSTR)cip);
-			//	}
-			//}
-			//HDC hdc = GetDC(eVar3);
 			for (const auto &x : arr) {
 				TCHAR buf[300];
 				_stprintf(buf, TEXT("%llu"), x.getNumber());
@@ -244,8 +229,6 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 					const char* cip = x.printer();
 
 					
-					// Wysylam do okna na dole do wyswietlenia
-					//SetTextAlign(hdc, TA_CENTER);
 					SetWindowText(eVar3, (LPCTSTR)cip);
 				}
 			}
@@ -268,33 +251,9 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			int y = _tstoi(buff2);
 			if (y < 1 || x<1) {
 
-				// int msgboxID = MessageBox(NULL, "Zly zakres liczbowy", "Blad",  MB_OK);
 				MessageBox(NULL, "Zly zakres liczbowy", "Blad", MB_SERVICE_NOTIFICATION);
 				return 0;
-				/*g_hPrzycisk = CreateWindowEx(0, "BUTTON", "Nasz przycisk", WS_CHILD | WS_VISIBLE,
-					100, 100, 150, 30, okno, NULL, NULL , NULL);
-			if ((HWND)lParam == g_hPrzycisk)
-			{
-				MessageBox(okno, "Nacisnąłeś przycisk!", "Ha!", MB_ICONINFORMATION);
-*/
-			//}
-				//switch (msgboxID) {
-				//case WM_COMMAND:
-				//	
-				//case IDCANCEL:// you check msdn for more cases
-				//{
-				//	PostQuitMessage(0);
-				//	return 0;
-				//}
-				//case MB_OK:
-				//{
-				//	PostQuitMessage(0);
-				//	return 0;
-
-				//}
-
-
-				//}
+			
 			}
 
 
@@ -329,14 +288,14 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 	//	PostQuitMessage(0);
 	//	return DefWindowProc(okno, komunikat, wParam, lParam);;
 	//}
-	case MB_SERVICE_NOTIFICATION:
-	{
-		PostQuitMessage(0); // wyslij komunikat WM_QUIT do kolejki programu  
-	 /*
-	  Zadanie: zakomentuj p/w operacje i sprawdz stan wykonywania programu  po zamknieciu okna poleceniem Alt-F4
-	 */
-		return 0;
-	}
+	//case MB_SERVICE_NOTIFICATION:
+	//{
+	//	PostQuitMessage(0); // wyslij komunikat WM_QUIT do kolejki programu  
+	// /*
+	//  Zadanie: zakomentuj p/w operacje i sprawdz stan wykonywania programu  po zamknieciu okna poleceniem Alt-F4
+	// */
+	//	return 0;
+	//}
 	case WM_CLOSE: // obsluz komunikat zamkniecia okna
 	{
 		DestroyWindow(okno); // zniszcz okno glowne wysylajac komunikat WM_DESTROY i nastepnie zakoncz program
