@@ -191,11 +191,11 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 					//unsigned long long a = pow(k, i);
 					long double a = std::powl(k, i);
 					TCHAR buf[200];
-					_stprintf(buf, TEXT("%.4Lf"), a);
+					_stprintf(buf, TEXT("%.15Lg"), a);
 					SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf); // Wpisywanie do listboxa
 					const size_t concatenated_size = 300;//MAX_PATH; //Inicjowanie chara i rozmiaru
 					char concatenated[concatenated_size];
-					snprintf(concatenated, concatenated_size, "%d^%d = %.4Lf", k, i, a); // Laczenie wszystkie w pieknego chara
+					snprintf(concatenated, concatenated_size, "%d^%d = %.15Lg", k, i, a); // Laczenie wszystkie w pieknego chara
 					//Equation eq(concatenated, a); // Tworzenie obiektu char, wartosc liczbowa
 					arr.push_back(Equation(concatenated, a)); // Dodawanie do vectora
 				}
@@ -242,10 +242,10 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			for (const auto &x : arr) {
 				//buf dla poteg
 				TCHAR buf[300];
-				_stprintf(buf, TEXT("%.4Lf"), x.getNumber());
+				_stprintf(buf, TEXT("%.15Lg"), x.getNumber());
 				//buf dla silni
 				TCHAR buf2[300];
-				_stprintf(buf2, TEXT("%.0Lf"), x.getNumber());
+				_stprintf(buf2, TEXT("%.15Lg"), x.getNumber());
 				if (strcmp(textBuffer, buf) == 0|| strcmp(textBuffer, buf2) == 0) {
 					// Pobieram chara
 					const char* cip = x.printer();					
@@ -278,13 +278,13 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 				silnia *= i;
 				TCHAR buf[300];
 				//_stprintf(buf, TEXT("%d"), silnia);
-				_stprintf(buf, TEXT("%.0Lf"), silnia);
+				_stprintf(buf, TEXT("%.15Lg"), silnia);
 				/*TCHAR buf2[20];
 				_stprintf(buf2, TEXT("%d !=%d"), i, silnia);*/
 				SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf);
 				const size_t concatenated_size = 300;
 				char concatenated[concatenated_size];
-				snprintf(concatenated, concatenated_size, "%d! = %.0Lf", i, silnia);
+				snprintf(concatenated, concatenated_size, "%d! = %.15Lg", i, silnia);
 				arr.push_back(Equation(concatenated, silnia));
 			}
 		}
