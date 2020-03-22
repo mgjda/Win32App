@@ -258,10 +258,13 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 
 
 			
-
+			int difference = y - x;
 			int sel = SendMessage(hWndComboBox, CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
 			int k = PowerList[sel].power;
 			unsigned long long silnia = 1;
+			for (int i = 1; i < x; i++) {
+				silnia *= i;
+			}
 			for (int i = x; i <= y; i++) {
 				silnia *= i;
 				TCHAR buf[300];
