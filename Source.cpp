@@ -247,8 +247,7 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			//MessageBox(NULL, textBuffer, _T("Selected Text:"), MB_OK);
 			delete[] textBuffer;
 			// Unikanie wiszących odniesień
-			textBuffer = NULL;
-
+			textBuffer = nullptr;
 			return 0;
 		}
 		else if (LOWORD(wParam) == IDC_BUTTON2) {
