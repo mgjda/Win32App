@@ -240,9 +240,13 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			//}
 			//HDC hdc = GetDC(eVar3);
 			for (const auto &x : arr) {
+				//buf dla poteg
 				TCHAR buf[300];
-				_stprintf(buf, TEXT("%.4lf"), x.getNumber());
-				if (strcmp(textBuffer, buf) == 0) {
+				_stprintf(buf, TEXT("%.4Lf"), x.getNumber());
+				//buf dla silni
+				TCHAR buf2[300];
+				_stprintf(buf2, TEXT("%.0Lf"), x.getNumber());
+				if (strcmp(textBuffer, buf) == 0|| strcmp(textBuffer, buf2) == 0) {
 					// Pobieram chara
 					const char* cip = x.printer();					
 					// Wysylam do okna na dole do wyswietlenia
@@ -269,7 +273,7 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			int y = _tstoi(buff2);
 			int sel = SendMessage(hWndComboBox, CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
 			int k = PowerList[sel].power;
-			long double silnia = 1;
+			long double silnia = 1.0;
 			for (int i = x; i <= y; i++) {
 				silnia *= i;
 				TCHAR buf[300];
