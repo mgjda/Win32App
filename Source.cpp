@@ -274,17 +274,30 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			int sel = SendMessage(hWndComboBox, CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
 			int k = PowerList[sel].power;
 			long double silnia = 1.0;
+			if (y < 1 || x < 1) {
+
+				MessageBox(NULL, "Zly zakres liczbowy", "Blad", MB_SERVICE_NOTIFICATION);
+				return 0;
+
+			}
+			if (x >= y) {
+				MessageBox(NULL, "Wartosc poczatkowa nie moze byc wieksza od koncowej", "Blad", MB_SERVICE_NOTIFICATION);
+				return 0;
+			}
+			for (int i = 1; i < x; i++) {
+				silnia *= i;
+			}
 			for (int i = x; i <= y; i++) {
 				silnia *= i;
 				TCHAR buf[300];
 				//_stprintf(buf, TEXT("%d"), silnia);
-				_stprintf(buf, TEXT("%.15Lg"), silnia);
+				_stprintf(buf, TEXT("%llu"), silnia);
 				/*TCHAR buf2[20];
 				_stprintf(buf2, TEXT("%d !=%d"), i, silnia);*/
 				SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf);
 				const size_t concatenated_size = 300;
 				char concatenated[concatenated_size];
-				snprintf(concatenated, concatenated_size, "%d! = %.15Lg", i, silnia);
+				snprintf(concatenated, concatenated_size, "%d! = %llu", i, silnia);
 				arr.push_back(Equation(concatenated, silnia));
 			}
 		}
