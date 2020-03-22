@@ -251,7 +251,25 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			return 0;
 		}
 		else if (LOWORD(wParam) == IDC_BUTTON2) {
-			MessageBox(NULL, "Hello, World2!", "Hi!", MB_OK);
+			lBox = GetDlgItem(okno, IDC_LIST1);
+			SendMessage(lBox, LB_RESETCONTENT, 0, 0);
+			TCHAR buff[1024];
+			TCHAR buff2[1024];
+			GetWindowText(eVar1, buff, 1024);
+			GetWindowText(eVar2, buff2, 1024);
+			int x = _tstoi(buff);
+			int y = _tstoi(buff2);
+			int sel = SendMessage(hWndComboBox, CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
+			int k = PowerList[sel].power;
+			int silnia = 1;
+			for (int i = x; i <= y; i++) {
+				silnia *= i;
+				TCHAR buf[10];
+				_stprintf(buf, TEXT("%d"), silnia);
+				/*TCHAR buf2[20];
+				_stprintf(buf2, TEXT("%d !=%d"), i, silnia);*/
+				SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf);
+			}
 		}
 		return 0;
 	}
