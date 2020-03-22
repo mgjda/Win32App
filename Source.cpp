@@ -233,13 +233,17 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			//		SetWindowText(eVar3, (LPCTSTR)cip);
 			//	}
 			//}
+			//HDC hdc = GetDC(eVar3);
 			for (const auto &x : arr) {
 				TCHAR buf[300];
 				_stprintf(buf, TEXT("%llu"), x.getNumber());
 				if (_tcscmp(textBuffer, buf) == 0) {
 					// Pobieram chara
 					const char* cip = x.printer();
+
+					
 					// Wysylam do okna na dole do wyswietlenia
+					//SetTextAlign(hdc, TA_CENTER);
 					SetWindowText(eVar3, (LPCTSTR)cip);
 				}
 			}
@@ -262,16 +266,23 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			int y = _tstoi(buff2);
 			int sel = SendMessage(hWndComboBox, CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
 			int k = PowerList[sel].power;
-			int silnia = 1;
+			unsigned long long silnia = 1;
 			for (int i = x; i <= y; i++) {
 				silnia *= i;
-				TCHAR buf[10];
-				_stprintf(buf, TEXT("%d"), silnia);
+				TCHAR buf[300];
+				//_stprintf(buf, TEXT("%d"), silnia);
+				_stprintf(buf, TEXT("%llu"), silnia);
 				/*TCHAR buf2[20];
 				_stprintf(buf2, TEXT("%d !=%d"), i, silnia);*/
 				SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf);
+				const size_t concatenated_size = 300;
+				char concatenated[concatenated_size];
+				snprintf(concatenated, concatenated_size, "%d! = %llu", i, silnia);
+				arr.push_back(Equation(concatenated, silnia));
 			}
 		}
+
+
 		return 0;
 	}
 	case WM_CLOSE: // obsluz komunikat zamkniecia okna
