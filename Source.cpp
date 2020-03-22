@@ -288,7 +288,9 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 				if (i <1) {
 					silnia += 0;
 				}
-				silnia *= i;
+				else {
+					silnia *= i;
+				}
 			}
 			for (int i = x; i <= y; i++) {
 				if (i<1) {
