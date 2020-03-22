@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Plik do³¹czany wygenerowany przez œrodowisko Microsoft Visual C++.
-// U¿ywany przez: Project1.rc
+// Plik doï¿½ï¿½czany wygenerowany przez ï¿½rodowisko Microsoft Visual C++.
+// Uï¿½ywany przez: Project1.rc
 //
 #define IDD_DIALOG1                     101
 #define IDC_LIST1                       1001
