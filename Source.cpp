@@ -195,7 +195,7 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 					SendMessage(lBox, LB_ADDSTRING, NULL, (LRESULT)buf); // Wpisywanie do listboxa
 					const size_t concatenated_size = 300;//MAX_PATH; //Inicjowanie chara i rozmiaru
 					char concatenated[concatenated_size];
-					snprintf(concatenated, concatenated_size, "%d^%d = %.15Lg", k, i, a); // Laczenie wszystkie w pieknego chara
+					snprintf(concatenated, concatenated_size, "%d^%d = %Lg", k, i, a); // Laczenie wszystkie w pieknego chara
 					//Equation eq(concatenated, a); // Tworzenie obiektu char, wartosc liczbowa
 					arr.push_back(Equation(concatenated, a)); // Dodawanie do vectora
 				}
@@ -245,7 +245,7 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 				_stprintf(buf, TEXT("%.15Lg"), x.getNumber());
 				//buf dla silni
 				TCHAR buf2[300];
-				_stprintf(buf2, TEXT("%.15Lg"), x.getNumber());
+				_stprintf(buf2, TEXT("%Lg"), x.getNumber());
 				if (strcmp(textBuffer, buf) == 0|| strcmp(textBuffer, buf2) == 0) {
 					// Pobieram chara
 					const char* cip = x.printer();					
