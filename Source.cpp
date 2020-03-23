@@ -25,12 +25,6 @@
 #include "resource.h"
 // deklaracja funkcji okna:
 LRESULT CALLBACK FunOkna(HWND, UINT, WPARAM, LPARAM);
-//unsigned long long potega(unsigned long long podstawa, unsigned long long wykladnik){
-//	unsigned long long wynik = 1;
-//	for (unsigned long long i = 0; i < wykladnik; i++)
-//		wynik *= podstawa;
-//	return wynik;
-//}
 //strukura wyswietlanie i liczba potegowa
 typedef struct{
 	TCHAR powText[MAX_PATH];
@@ -42,17 +36,6 @@ private:
 	long double  number;
 public:
 	Equation(char* e,long double n) {
-		/*int i = 0, lenth = 0;
-		while (e[i++])
-			lenth++;
-		equation = new char[lenth + 1];
-		i = 0;
-		while (e[i])
-		{
-			equation[i] = e[i];
-			i++;
-		}
-		equation[i] = e[i];*/
 		size_t len = strlen(e);
 		equation = new char[len+1];
 		strcpy(equation, e);
@@ -109,11 +92,11 @@ HWND eVar3; // To jest ten na samym dole okna z regu�� z jakiej zosta�o wy
 int WINAPI WinMain(HINSTANCE biezAplik, HINSTANCE poprzAplik, LPSTR linPolec, int trybOkna){// nazwa klasy rejestrowanej w systemie dla okna aplikacji
 	char nazwaKlasy[] = "OknoAplikacji";
 	// Zdefiniowana konsola do można używać do debugowania. 
-	AllocConsole();
+	/*AllocConsole();
 	freopen("conin$", "r", stdin);
 	freopen("conout$", "w", stdout);
 	freopen("conout$", "w", stderr);
-	printf("Debugging Window:\n"); // Używasz normalnie printf()
+	printf("Debugging Window:\n"); */// Używasz normalnie printf()
 	WNDCLASS klasaOkna; // rekord do opisu nowej klasy okna
 	HWND okno; // uchwyt obiektu okna z p/w klasy
 	// wypelnienie rekordu parametrami nowej klasy okna:
@@ -174,19 +157,11 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			TCHAR buff2[1024];
 			GetWindowText(eVar1, buff, 1024); //Przyjmuje warto�� z inputu
 			GetWindowText(eVar2, buff2, 1024); //Przyjmuje warto�� z inputu
-			//TCHAR* str = buff; //magiczne sztuczki
-			//TCHAR* str2 = buff; //magiczne sztuczki
 			int n = _tstoi(buff); 
 			int n2 = _tstoi(buff2); 
 			if (n2 >= n) {
-				//int fooSize = n2 - n; // rozmiar dla tablicy
-				//TCHAR ** foo = new TCHAR*[fooSize];
 				int sel = SendMessage(hWndComboBox, CB_GETCURSEL, (WPARAM)0, (LPARAM)0); //pobranie aktualnie wybranego indeksu z combobox
 				int k = PowerList[sel].power; //wybranie z listy odpowiedniej liczby dla indeksu
-				//int result;
-				//TCHAR buf[300];
-				//int sizeofarr = (n2 - n)+1;
-				//arr.reserve(sizeofarr);
 				for (int i = n; i <= n2; i++) {
 					//unsigned long long a = pow(k, i);
 					long double a = std::powl(k, i);
@@ -223,22 +198,6 @@ LRESULT CALLBACK FunOkna(HWND okno, UINT komunikat, WPARAM wParam, LPARAM lParam
 			// Biore tekst do bufforu
 			SendMessage(lBox, LB_GETTEXT, (WPARAM)itemIndex, (LPARAM)textBuffer);
 			// Pokazówka
-
-			//for (std::vector<Equation>::const_iterator i = arr.begin(); i != arr.end(); ++i) {
-			//	//Pobieram po koleji wszystkie obiekty z listy
-			//	Equation eq = *i;
-			//	TCHAR buf[300];
-			//	//Tu konwersja
-			//	_stprintf(buf, TEXT("%d"), eq.getNumber());
-			//	// Porownuje do numeru ktory wybralem z listy
-			//	if (_tcscmp(textBuffer,buf ) == 0 ) {
-			//		// Pobieram chara
-			//		char* cip = eq.printer();
-			//		// Wysylam do okna na dole do wyswietlenia
-			//		SetWindowText(eVar3, (LPCTSTR)cip);
-			//	}
-			//}
-			//HDC hdc = GetDC(eVar3);
 			for (const auto &x : arr) {
 				//buf dla poteg
 				TCHAR buf[300];
