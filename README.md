@@ -1,6 +1,6 @@
 # Win32App
 
-Win32Appis an app created in [Visual Studio](https://visualstudio.microsoft.com/pl/) utilizing [Win32 API](https://docs.microsoft.com/en-us/windows/win32/) and C++.
+Win32App is an app created in [Visual Studio](https://visualstudio.microsoft.com/pl/) utilizing [Win32 API](https://docs.microsoft.com/en-us/windows/win32/) and C++.
 
 ## Installation
 
