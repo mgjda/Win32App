@@ -8,6 +8,7 @@ Download or copy repository, open and compile it by yourself using Visual Studio
 
 ## Usage
 ![Power](https://i.ibb.co/wsDyd57/1.png)
+
 ![Factorial](https://i.ibb.co/SfSwR4n/2.png)
 
 ## Contributors
