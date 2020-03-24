@@ -7,9 +7,7 @@ Win32Appis an app created in [Visual Studio](https://visualstudio.microsoft.com/
 Download or copy repository, open and compile it by yourself using Visual Studio.
 
 ## Usage
-![Power](https://i.ibb.co/wsDyd57/1.png)
-
-![Factorial](https://i.ibb.co/SfSwR4n/2.png)
+![Usage](https://s5.gifyu.com/images/usaged6d8470beb7200f3.gif)
 
 ## Contributors
 Created together with [MaestroMichael](https://github.com/MaestroMichael) and [Wasgo097](https://github.com/Wasgo097).
